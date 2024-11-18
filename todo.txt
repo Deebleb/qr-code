@@ -1,0 +1,2 @@
+-bit map creator
+-make a qr code urself
