@@ -4,7 +4,7 @@
 
 int main(){
     MonoBmp qr = MonoBmp("test");
-    qr.pixels = {true, false, false, true};
+    qr.path = "C:/Users/howie/Desktop/CodeStuff/C-C++/qr_code/output/";
     qr.save();
     return 0;
 }

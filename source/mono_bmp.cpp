@@ -14,6 +14,15 @@ MonoBmp::MonoBmp(std::string _name, std::string _path)
 
 MonoBmp::~MonoBmp(){}
 
+void MonoBmp::setPixel(int pixelX, int pixelY, bool colour){
+    if(pixelY < height && pixelX < width){
+        pixels[pixelY][pixelX] = colour;
+    }
+    else{
+        std::cout << "pixel set is not withing image boundaries";
+    }
+}
+
 int MonoBmp::getRowSize(){ //size of pixel row in bytes
     return ((bitsPerPixel * width + 31)/32) *4;
 }
@@ -22,6 +31,7 @@ void MonoBmp::save(){
     //open files
     std::ofstream of;
     of.open(path + fileName + FILE_EXTENSION, std::ofstream::trunc);
+    std::cout << path + fileName + FILE_EXTENSION;
     if(!of.is_open()){
         std::cout << "File failed to open\n";
         return;
@@ -55,7 +65,7 @@ void MonoBmp::save(){
     };
 
     unsigned char informationHeader[INFORMATION_HEADER_SIZE] =
-    {
+    {       
         //DIB header: Windows BITMAPINFOHEADER
         INFORMATION_HEADER_SIZE,
         INFORMATION_HEADER_SIZE >> 8,
@@ -109,16 +119,16 @@ void MonoBmp::save(){
 
     unsigned char colourTable[8] = //4 per 2 colours , idk why its backwards :/ thats probably just how it is
     {
-        //black (1)
-        blackColour[0],
-        blackColour[1],
-        blackColour[2],
-        0x00,
-
         //white (0)
         whiteColour[0],
         whiteColour[1],
         whiteColour[2],
+        0x00,
+
+        //black (1)
+        blackColour[0],
+        blackColour[1],
+        blackColour[2],
         0x00
     };
 
@@ -129,34 +139,19 @@ void MonoBmp::save(){
     of.write(reinterpret_cast<char*>(colourTable), 8);
     std::cout << "Colour table  written to file\n";
 
-    /*
-    pixel array:
-        each row:
-            including padding, add bytes to the row:
-                if the bit is within the image width (not padding):
-                    write pixel
-                else:
-                    write 0 for padding
-
-    */
-
-    int pixelIndex = 0;
     for(int i = 0; i < height;i++){ //each row
-        for(int j = 0; j<getRowSize(); j++){ //row size in bytes including padding
+        for(int j = 0; j<getRowSize(); j++){ //each byte in row
+
             //write a byte
             unsigned char byte =0; //byte with no data
-
-            for(int k = 1;k <= 8;k++){ //size of byte
+            for(int k = 0;k < 8;k++){
                 byte *= 2; //push last bit along
 
-                if(j*8 +k <= width){ //if the bit is not padding
-                    if(pixelIndex >= pixels.size()){//pixel added but not in array
-                        std::cout << "Size of image greater than amount of pixels in array\n";
-                    }
-                    byte += pixels[pixelIndex]; //add the pixel
-                    pixelIndex += 1;//move index counter to next pixel
+                if(j*8 + k < width){ //check if pixel is within the image's width otherwise it is padding (so 0)
+                    byte += pixels[i][j*8 + k];
+                    std::cout << pixels[i][j*8 + k];
                 }
-            //if bit is padding leave the byte the same (writing a 0)
+                //if bit is padding leave the byte the same (writing a 0)
             }
         of << byte; //write byte to file
         }
