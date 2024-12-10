@@ -4,12 +4,15 @@
 #include <cmath>
 #include "../include/mono_bmp.h"
 
-//For bitmap image thanks to wikipedia: https://en.wikipedia.org/wiki/BMP_file_format and this video: https://www.youtube.com/watch?v=vqT5j38bWGg
+//Thanks to wikipedia: https://en.wikipedia.org/wiki/BMP_file_format and this video: https://www.youtube.com/watch?v=vqT5j38bWGg
 
-MonoBmp::MonoBmp(std::string _name, std::string _path)
-: path(_path)
-{
-
+MonoBmp::MonoBmp(std::string _name, int _width, int _height, std::string _path)
+: fileName(_name),width(_width), height(_height), path(_path){
+    //resizes the vector to have all the pixels to avoid trying to access out of the vector
+    pixels.resize(height);
+    for(int i = 0; i < height; i++){
+        pixels[i].resize(width);
+    }
 }
 
 MonoBmp::~MonoBmp(){}
@@ -148,8 +151,8 @@ void MonoBmp::save(){
                 byte *= 2; //push last bit along
 
                 if(j*8 + k < width){ //check if pixel is within the image's width otherwise it is padding (so 0)
-                    byte += pixels[i][j*8 + k];
-                    std::cout << pixels[i][j*8 + k];
+                    if(!pixels[i].capacity() <= j*8 + k)
+                        byte += pixels[i][j*8 + k];
                 }
                 //if bit is padding leave the byte the same (writing a 0)
             }

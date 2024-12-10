@@ -7,13 +7,13 @@ private:
     std::string fileName = "test"; 
     const std::string FILE_EXTENSION = ".bmp";
     unsigned char bitsPerPixel = 1;
-    std::vector<std::vector<bool>> pixels = {{true, false},{false}};
+    std::vector<std::vector<bool>> pixels = {};
     int width = 2;
     int height = 2;
 
     int getRowSize();
 public:
-    MonoBmp(std::string _name, std::string _path = "../output/");
+    MonoBmp(std::string name, int width, int height, std::string path = "../output/");
     ~MonoBmp();
     void save();
     void setPixel(int pixelX,int pixelY, bool colour);
